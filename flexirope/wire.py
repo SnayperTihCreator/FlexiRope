@@ -37,7 +37,7 @@ class BaseWire(Generic[P, R]):
                 raise TypeError(f"Plugin {p.__class__.__name__} is async, but wire {self._name} is sync!")
             
             if hasattr(p, 'after'):
-                result = p.after(self, result)
+                result = p.after(self, args, kwargs, result)
         return result
 
 
@@ -66,9 +66,9 @@ class AsyncWire(BaseWire[P, R]):
             after_method = getattr(p, 'after', None)
             if after_method:
                 if inspect.iscoroutinefunction(after_method):
-                    result = await after_method(self, result)
+                    result = await after_method(self, args, kwargs, result)
                 else:
-                    result = after_method(self, result)
+                    result = after_method(self, args, kwargs, result)
         return result
     
     def __await__(self):
